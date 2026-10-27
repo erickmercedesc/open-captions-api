@@ -1,0 +1,19 @@
+# Single-container mode for EasyPanel when only one app process is configured.
+# Set the service command to: all
+services:
+  capservice:
+    build: .
+    image: capservice:latest
+    command: ["all"]
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      DATA_DIR: /data
+    volumes:
+      - capservice-data:/data
+
+volumes:
+  capservice-data:

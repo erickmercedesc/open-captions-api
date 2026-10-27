@@ -1,0 +1,38 @@
+services:
+  api:
+    build: .
+    image: capservice:latest
+    command: ["api"]
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      DATA_DIR: /data
+    volumes:
+      - capservice-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  worker:
+    build: .
+    image: capservice:latest
+    command: ["worker"]
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATA_DIR: /data
+    volumes:
+      - capservice-data:/data
+    depends_on:
+      api:
+        condition: service_started
+
+volumes:
+  capservice-data:
