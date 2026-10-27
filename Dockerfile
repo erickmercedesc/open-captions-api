@@ -17,6 +17,16 @@ RUN apt-get update \
         git \
         curl \
         ca-certificates \
+        libegl1 \
+        libgl1 \
+        libgles2 \
+        libglx-mesa0 \
+        libglib2.0-0 \
+        libsm6 \
+        libxext6 \
+        libxrender1 \
+        libfontconfig1 \
+        fonts-dejavu-core \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
