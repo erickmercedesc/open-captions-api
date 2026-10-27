@@ -4,12 +4,27 @@ services:
     image: capservice:latest
     command: ["api"]
     restart: unless-stopped
-    ports:
-      - "8000:8000"
     env_file:
       - .env
     environment:
       DATA_DIR: /data
+      HOST: 0.0.0.0
+      PORT: "8000"
+      API_KEY: ${API_KEY}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL}
+      MAX_VIDEO_BYTES: ${MAX_VIDEO_BYTES:-104857600}
+      MAX_VIDEO_DURATION_SECONDS: ${MAX_VIDEO_DURATION_SECONDS:-120}
+      DOWNLOAD_TIMEOUT_SECONDS: ${DOWNLOAD_TIMEOUT_SECONDS:-60}
+      PROCESSING_TIMEOUT_SECONDS: ${PROCESSING_TIMEOUT_SECONDS:-600}
+      MAX_CONCURRENT_JOBS: ${MAX_CONCURRENT_JOBS:-1}
+      OUTPUT_RETENTION_HOURS: ${OUTPUT_RETENTION_HOURS:-24}
+      WEBHOOK_MAX_ATTEMPTS: ${WEBHOOK_MAX_ATTEMPTS:-5}
+      WEBHOOK_TIMEOUT_SECONDS: ${WEBHOOK_TIMEOUT_SECONDS:-10}
+      WEBHOOK_BACKOFF_BASE_SECONDS: ${WEBHOOK_BACKOFF_BASE_SECONDS:-2}
+      DEFAULT_TEMPLATE: ${DEFAULT_TEMPLATE:-default}
+      WHISPER_MODEL: ${WHISPER_MODEL:-base}
+      WHISPER_BACKEND: ${WHISPER_BACKEND:-faster}
+      WHISPER_LANGUAGE: ${WHISPER_LANGUAGE:-es}
     volumes:
       - capservice-data:/data
     healthcheck:
@@ -17,7 +32,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 20s
+      start_period: 40s
 
   worker:
     build: .
@@ -28,11 +43,26 @@ services:
       - .env
     environment:
       DATA_DIR: /data
+      API_KEY: ${API_KEY}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL}
+      MAX_VIDEO_BYTES: ${MAX_VIDEO_BYTES:-104857600}
+      MAX_VIDEO_DURATION_SECONDS: ${MAX_VIDEO_DURATION_SECONDS:-120}
+      DOWNLOAD_TIMEOUT_SECONDS: ${DOWNLOAD_TIMEOUT_SECONDS:-60}
+      PROCESSING_TIMEOUT_SECONDS: ${PROCESSING_TIMEOUT_SECONDS:-600}
+      MAX_CONCURRENT_JOBS: ${MAX_CONCURRENT_JOBS:-1}
+      OUTPUT_RETENTION_HOURS: ${OUTPUT_RETENTION_HOURS:-24}
+      WEBHOOK_MAX_ATTEMPTS: ${WEBHOOK_MAX_ATTEMPTS:-5}
+      WEBHOOK_TIMEOUT_SECONDS: ${WEBHOOK_TIMEOUT_SECONDS:-10}
+      WEBHOOK_BACKOFF_BASE_SECONDS: ${WEBHOOK_BACKOFF_BASE_SECONDS:-2}
+      DEFAULT_TEMPLATE: ${DEFAULT_TEMPLATE:-default}
+      WHISPER_MODEL: ${WHISPER_MODEL:-base}
+      WHISPER_BACKEND: ${WHISPER_BACKEND:-faster}
+      WHISPER_LANGUAGE: ${WHISPER_LANGUAGE:-es}
     volumes:
       - capservice-data:/data
     depends_on:
       api:
-        condition: service_started
+        condition: service_healthy
 
 volumes:
   capservice-data:

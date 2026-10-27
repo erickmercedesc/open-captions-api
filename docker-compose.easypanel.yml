@@ -1,19 +1,28 @@
-# Single-container mode for EasyPanel when only one app process is configured.
-# Set the service command to: all
+# Alternative single-container Compose for EasyPanel.
+# Prefer docker-compose.yml (api + worker). Do not publish host ports;
+# attach a domain to the service below on container port 8000.
 services:
   capservice:
     build: .
     image: capservice:latest
     command: ["all"]
     restart: unless-stopped
-    ports:
-      - "8000:8000"
     env_file:
       - .env
     environment:
       DATA_DIR: /data
+      HOST: 0.0.0.0
+      PORT: "8000"
+      API_KEY: ${API_KEY}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL}
     volumes:
       - capservice-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
 
 volumes:
   capservice-data:

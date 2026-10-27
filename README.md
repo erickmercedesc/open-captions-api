@@ -63,16 +63,18 @@ Los fallos del webhook se reintentan con espera progresiva. El video no se vuelv
 
 ## Despliegue en EasyPanel
 
-1. Cree un proyecto a partir de este repositorio.
-2. Use el `Dockerfile` de la raíz.
-3. Configure el comando:
-   - Recomendado con dos servicios: `api` y `worker` (ver `docker-compose.yml`).
-   - En un solo contenedor EasyPanel: comando `all`.
-4. Monte un volumen persistente en `/data`.
-5. Defina las variables de `.env.example`. `API_KEY` y `PUBLIC_BASE_URL` son obligatorias.
-6. Publique el puerto `8000` y ponga `PUBLIC_BASE_URL` con el dominio HTTPS público.
+Use un servicio **Compose** (no App). EasyPanel gestiona dominio, HTTPS y variables; el YAML solo define contenedores, build, healthchecks y el volumen.
 
-El primer arranque puede descargar el modelo Whisper si no quedó cacheado en la imagen.
+1. En el proyecto, **New Service → Compose**.
+2. Fuente **Git**: repositorio, rama, **Build Path** `/` y **Docker Compose File** `docker-compose.yml`.
+3. En **Environment**, pegue `.env.example`, cambie `API_KEY` y `PUBLIC_BASE_URL`, y active **Create .env file**.
+4. Despliegue. EasyPanel ejecuta `docker compose up --build -d`.
+5. Añada un dominio hacia el servicio interno `api` y el puerto de contenedor `8000` (HTTP interno). No publique `ports` en el Compose ni apunte el dominio al `worker`.
+6. Ponga `PUBLIC_BASE_URL` con la URL HTTPS pública de ese dominio y vuelva a desplegar.
+
+Los datos (cola SQLite y MP4) viven en el volumen nombrado `capservice-data` montado en `/data`.
+
+El primer build descarga Chromium y el modelo Whisper; puede tardar varios minutos.
 
 ## Desarrollo local
 
