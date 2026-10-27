@@ -12,7 +12,6 @@ data
 .env
 tests
 .DS_Store
-README.md
 dist
 build
 artifacts
